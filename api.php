@@ -1,15 +1,4 @@
 <?php
-$host = 'localhost';
-$user = 'down';
-$pass = 'KM&{z?N-b*mT';
-$database = 'down';
-$db = new mysqli($host,$user,$pass,$database);
-if ($db->connect_errno)die('db_error');
-if(isset($_GET[array_keys($_GET)[0]]) && strlen(array_keys($_GET)[0]) == 32){
-    $link = array_keys($_GET)[0];
-}
-$db->close();
-exit();
 use danog\MadelineProto\API;
 if (!file_exists('madeline.php')) copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');include 'madeline.php';
 $MadelineProto = new API('bot.madeline');$MadelineProto->start();
