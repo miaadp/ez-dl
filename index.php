@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
                 if (isset($info['media'])){
                     if (isset($info['media']['document'])){
                         $media = $info['media'];
-                        if (isset($org_request[3])) {
+                        if (isset($org_request[2])) {
                             $user_name = trim(explode('?', $org_request[2])[0]);
                         }
                         if (isset($user_name) && !empty($user_name)){
