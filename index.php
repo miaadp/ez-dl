@@ -1,5 +1,5 @@
 <?php
-
+error_reporting(0);
 use danog\MadelineProto\API;
 if (!file_exists('madeline.php'))copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
 if ($_SERVER['REQUEST_URI'] !== '/') {
@@ -24,14 +24,19 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
     else {
         $id_hex = trim($type);
         if (ctype_xdigit($id_hex)){
+            echo '-1';
             $id = hexdec($id_hex);
             include 'madeline.php';
-            $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')],'logger'=>['logger_level'=>5, 'max_size'=>5242882], 'serialization'=>['serialization_interval'=>30, 'cleanup_before_serialization'=>true]]);
+            $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')]]);
             $MadelineProto->botLogin(getenv(['token']));
             $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]])['messages'][0];
+            echo '0';
             if ($info['_'] === 'message'){
+                echo '1';
                 if (isset($info['media'])){
+                    echo '2';
                     if (isset($info['media']['document'])){
+                        echo '3';
                         $media = $info['media'];
                         if (isset($org_request[3])) {
                             $user_name = trim(explode('?', $org_request[2])[0]);
@@ -48,6 +53,7 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
                         else {
                             $filename = 'unknown';
                         }
+                        echo '4';
 
                         $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
                         $old_ie = (bool) preg_match('#MSIE [3-8]\.#', $ua);
@@ -70,8 +76,10 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
                             $header = "filename*=UTF-8''" . rawurlencode($filename) . '; filename="' . rawurlencode($filename) . '"';
                         }
                         header('Content-Disposition: attachment; ' . $header);
+                        echo '5';
 
                         $MadelineProto->downloadToBrowser($media);
+                        echo '6';
                     }
                     else{
                         echo 'this type of media not allowed for now';
