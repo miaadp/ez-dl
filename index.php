@@ -22,18 +22,16 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
         }
     }
     else {
-        echo $type.'<br>';
-        $id_hex = $type;
-        echo $id_hex.'<br>';
-        echo ctype_xdigit($id_hex).'<br>';
+        $id_hex = trim($type);
         if (ctype_xdigit($id_hex)){
             $id = hex2bin($id_hex);
             echo $id.'<br>';
             include 'madeline.php';
             $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')],'logger'=>['logger_level'=>5, 'max_size'=>5242882], 'serialization'=>['serialization_interval'=>30, 'cleanup_before_serialization'=>true]]);
             $MadelineProto->botLogin(getenv(['token']));
-            
+
             $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]]);
+            echo json_encode($info);
             if (isset($info['media'])){
                 $from_id = $info['peer_id']['user_id'];
                 $media = $info['media'];
