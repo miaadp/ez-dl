@@ -22,12 +22,17 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
         }
     }
     else {
+        echo $type.'<br>';
         $id_hex = $type;
+        echo $id_hex.'<br>';
+        echo ctype_xdigit($id_hex).'<br>';
         if (ctype_xdigit($id_hex)){
             $id = hex2bin($id_hex);
+            echo $id.'<br>';
             include 'madeline.php';
-            $MadelineProto = new API('bot.madeline');
-            $MadelineProto->start();
+            $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')],'logger'=>['logger_level'=>5, 'max_size'=>5242882], 'serialization'=>['serialization_interval'=>30, 'cleanup_before_serialization'=>true]]);
+            $MadelineProto->botLogin(getenv(['token']));
+            
             $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]]);
             if (isset($info['media'])){
                 $from_id = $info['peer_id']['user_id'];
@@ -35,7 +40,7 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
                 if (isset($org_request[3])) {
                     $user_name = trim(explode('?', $org_request[2])[0]);
                 }
-                
+
                 if (isset($user_name) && !empty($user_name)){
                     $filename = trim($user_name);
                 }
@@ -76,7 +81,6 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
             else{
                 echo 'message is not media';
             }
-            
         }
         else{
             echo 'id must be hex numeric';
@@ -86,4 +90,3 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
 else{
     echo '<h1>Hello Babe!</h1>';
 }
-exit();
