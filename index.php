@@ -24,60 +24,65 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
     else {
         $id_hex = trim($type);
         if (ctype_xdigit($id_hex)){
-            $id = hex2bin($id_hex);
-            echo $id.'<br>';
+            $id = hexdec($id_hex);
             include 'madeline.php';
             $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')],'logger'=>['logger_level'=>5, 'max_size'=>5242882], 'serialization'=>['serialization_interval'=>30, 'cleanup_before_serialization'=>true]]);
             $MadelineProto->botLogin(getenv(['token']));
+            $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]])['messages'][0];
+            if ($info['_'] === 'message'){
+                if (isset($info['media'])){
+                    if (isset($info['media']['document'])){
+                        $media = $info['media'];
+                        if (isset($org_request[3])) {
+                            $user_name = trim(explode('?', $org_request[2])[0]);
+                        }
+                        if (isset($user_name) && !empty($user_name)){
+                            $filename = trim($user_name);
+                        }
+                        elseif (isset($media['document']['attributes'][0]['file_name'])) {
+                            $filename = $media['document']['attributes'][0]['file_name'];
+                        }
+                        elseif (isset($media['document']['attributes'][1]['file_name'])) {
+                            $filename = $media['document']['attributes'][1]['file_name'];
+                        }
+                        else {
+                            $filename = 'unknown';
+                        }
 
-            $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]]);
-            echo json_encode($info);
-            if (isset($info['media'])){
-                $from_id = $info['peer_id']['user_id'];
-                $media = $info['media'];
-                if (isset($org_request[3])) {
-                    $user_name = trim(explode('?', $org_request[2])[0]);
-                }
+                        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+                        $old_ie = (bool) preg_match('#MSIE [3-8]\.#', $ua);
+                        if (preg_match('/^[a-zA-Z0-9_.-]+$/', $filename)) {
+                            $header = 'filename="' . $filename . '"';
+                        }
+                        elseif ($old_ie || preg_match('#Firefox/(\d+)\.#', $ua, $matches) && $matches[1] < 5) {
+                            $header = 'filename="' . rawurlencode($filename) . '"';
+                        }
+                        elseif (preg_match('#Chrome/(\d+)\.#', $ua, $matches) && $matches[1] < 11) {
+                            $header = 'filename=' . $filename;
+                        }
+                        elseif (preg_match('#Safari/(\d+)\.#', $ua, $matches) && $matches[1] < 6) {
+                            $header = 'filename=' . $filename;
+                        }
+                        elseif (preg_match('#Android #', $ua, $matches)) {
+                            $header = 'filename="' . $filename . '"';
+                        }
+                        else {
+                            $header = "filename*=UTF-8''" . rawurlencode($filename) . '; filename="' . rawurlencode($filename) . '"';
+                        }
+                        header('Content-Disposition: attachment; ' . $header);
 
-                if (isset($user_name) && !empty($user_name)){
-                    $filename = trim($user_name);
+                        $MadelineProto->downloadToBrowser($media);
+                    }
+                    else{
+                        echo 'this type of media not allowed for now';
+                    }
                 }
-                elseif (isset($info['media']['document']['attributes'][0]['file_name'])) {
-                    $filename = $info['media']['document']['attributes'][0]['file_name'];
+                else{
+                    echo 'message is not media';
                 }
-                elseif (isset($info['media']['document']['attributes'][1]['file_name'])) {
-                    $filename = $info['media']['document']['attributes'][1]['file_name'];
-                }
-                else {
-                    $filename = 'unknown';
-                }
-
-                $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-                $old_ie = (bool) preg_match('#MSIE [3-8]\.#', $ua);
-                if (preg_match('/^[a-zA-Z0-9_.-]+$/', $filename)) {
-                    $header = 'filename="' . $filename . '"';
-                }
-                elseif ($old_ie || preg_match('#Firefox/(\d+)\.#', $ua, $matches) && $matches[1] < 5) {
-                    $header = 'filename="' . rawurlencode($filename) . '"';
-                }
-                elseif (preg_match('#Chrome/(\d+)\.#', $ua, $matches) && $matches[1] < 11) {
-                    $header = 'filename=' . $filename;
-                }
-                elseif (preg_match('#Safari/(\d+)\.#', $ua, $matches) && $matches[1] < 6) {
-                    $header = 'filename=' . $filename;
-                }
-                elseif (preg_match('#Android #', $ua, $matches)) {
-                    $header = 'filename="' . $filename . '"';
-                }
-                else {
-                    $header = "filename*=UTF-8''" . rawurlencode($filename) . '; filename="' . rawurlencode($filename) . '"';
-                }
-                header('Content-Disposition: attachment; ' . $header);
-
-                $MadelineProto->downloadToBrowser($media);
             }
             else{
-                echo 'message is not media';
+                echo 'message not found';
             }
         }
         else{
