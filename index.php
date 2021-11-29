@@ -24,11 +24,12 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
     else {
         $id_hex = trim($type);
         if (ctype_xdigit($id_hex)){
-            echo '-1';
+            echo '-1<br>';
+            echo getenv('api_id').'<br>';
             $id = hexdec($id_hex);
             include 'madeline.php';
             $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')]]);
-            $MadelineProto->botLogin(getenv(['token']));
+            $MadelineProto->start();
             $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]])['messages'][0];
             echo '0';
             if ($info['_'] === 'message'){
