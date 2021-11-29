@@ -29,9 +29,7 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
             echo $id;
             include 'madeline.php';
             $MadelineProto=new API('bot.madeline', ['app_info'=>['api_id'=>getenv('api_id'),'api_hash'=>getenv('api_hash')]]);
-            print_r($MadelineProto);
             $MadelineProto->start();
-            print_r($MadelineProto);
             $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [$id]])['messages'][0];
             print_r($info);
             echo '0';
