@@ -1,0 +1,24 @@
+{
+  "env": {
+    "channel_files_chat_id": {
+      "description": " Telegram channel chat ID for storing and managing files",
+      "required": "true",
+      "value": ""
+    },
+    "channel_username": {
+      "description": "Telegram channel username for support",
+      "required": "true",
+      "value": ""
+    },
+    "name": {
+      "description": "your name , will show in player page",
+      "required": "true",
+      "value": ""
+    },
+    "domain": {
+      "description": "Heroku application domain Example: https://newdlstar.herokuapp.com",
+      "required": "true",
+      "value": ""
+    }
+  }
+}
