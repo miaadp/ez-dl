@@ -15,11 +15,6 @@
       "required": "true",
       "value": ""
     },
-    "token": {
-      "description": "Telegram robot token for launch .",
-      "required": "true",
-      "value": ""
-    },
     "name": {
       "description": "your name , will show in player page",
       "required": "true",
