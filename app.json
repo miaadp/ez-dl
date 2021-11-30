@@ -20,6 +20,11 @@
       "required": "true",
       "value": ""
     },
+    "token": {
+      "description": "Telegram robot token for launch .",
+      "required": "true",
+      "value": ""
+    },
     "domain": {
       "description": "Heroku application domain Example: https://newdlstar.herokuapp.com",
       "required": "true",
