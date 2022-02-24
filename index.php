@@ -30,24 +30,21 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
             $info = $MadelineProto->channels->getMessages(['channel' => getenv('channel_files_chat_id'), 'id' => [hexdec($id_hex)]])['messages'][0];
             if ($info['_'] === 'message'){
                 if (isset($info['media'])){
-                    if (isset($info['media']['document'])){
-                        $media = $info['media'];
+                    $media = $info['media'];
+                    if (isset($info['media']['document'])) {
                         if (isset($org_request[2])) {
                             $user_name = trim(explode('?', $org_request[2])[0]);
-                            if (isset($user_name) && !empty($user_name)){
-                                if (isset($media['document']['attributes'][0]['file_name'])){
+                            if (isset($user_name) && !empty($user_name)) {
+                                if (isset($media['document']['attributes'][0]['file_name'])) {
                                     $media['document']['attributes'][0]['file_name'] = $user_name;
                                 }
-                                if (isset($media['document']['attributes'][1]['file_name'])){
+                                if (isset($media['document']['attributes'][1]['file_name'])) {
                                     $media['document']['attributes'][1]['file_name'] = $user_name;
                                 }
                             }
                         }
-                        $MadelineProto->downloadToBrowser($media);
                     }
-                    else{
-                        $MadelineProto->downloadToBrowser($info['media']);
-                    }
+                    $MadelineProto->downloadToBrowser($media);
                 }
                 else{
                     echo 'message is not media';
