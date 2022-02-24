@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_URI'] !== '/') {
                         $MadelineProto->downloadToBrowser($media);
                     }
                     else{
-                        echo 'this type of media not allowed for now';
+                        $MadelineProto->downloadToBrowser($info['media']);
                     }
                 }
                 else{
